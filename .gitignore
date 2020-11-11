@@ -528,3 +528,5 @@ target/
 tmp/
 *.exe
 
+coverage.out
+vendor
