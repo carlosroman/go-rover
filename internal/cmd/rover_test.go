@@ -40,6 +40,19 @@ func Test_RoverMove(t *testing.T) {
 	}
 }
 
+func TestRover_Reverse(t *testing.T) {
+	startingPoint := int8(5)
+	for _, f := range []cmd.Orientation{cmd.North, cmd.East, cmd.South, cmd.West} {
+		t.Run(string(f), func(t *testing.T) {
+			r := cmd.NewRover(startingPoint, startingPoint, f)
+			_, _ = r.Move(cmd.Forward)
+			x, y := r.Reverse()
+			assert.Equal(t, int8(5), x)
+			assert.Equal(t, int8(5), y)
+		})
+	}
+}
+
 func Test_RoverTurnLeft(t *testing.T) {
 	startingPoint := int8(5)
 	r := cmd.NewRover(startingPoint, startingPoint, cmd.North)

@@ -59,3 +59,10 @@ func TestPlanet_IsValidLocation(t *testing.T) {
 		})
 	}
 }
+
+func TestPlanet_MarkLocation(t *testing.T) {
+	err, m := mars.NewMars("5 5")
+	require.NoError(t, err)
+	assert.True(t, m.MarkLocation(6, 6))
+	assert.False(t, m.MarkLocation(6, 6))
+}

@@ -44,7 +44,12 @@ func move(rover Rover, mars mars.Mars, reader *bufio.Reader, out io.Writer) erro
 	for i := range trimSuffix(text) {
 		x, y = rover.Move(Direction(text[i]))
 		if !mars.IsValidLocation(uint8(x), uint8(y)) {
-			lost = "LOST"
+			if mars.MarkLocation(uint8(x), uint8(y)) {
+				lost = "LOST"
+			}
+			if lost != "LOST" {
+				x, y = rover.Reverse()
+			}
 		}
 	}
 

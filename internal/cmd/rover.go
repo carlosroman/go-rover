@@ -25,6 +25,7 @@ const (
 type Rover interface {
 	Move(direction Direction) (x, y int8)
 	Orientation() Orientation
+	Reverse() (x, y int8)
 }
 
 type rover struct {
@@ -74,6 +75,20 @@ func (r *rover) Move(direction Direction) (x, y int8) {
 		r.y--
 	case West:
 		r.x--
+	}
+	return r.x, r.y
+}
+
+func (r *rover) Reverse() (x, y int8) {
+	switch r.orientation {
+	case North:
+		r.y--
+	case East:
+		r.x--
+	case South:
+		r.y++
+	case West:
+		r.x++
 	}
 	return r.x, r.y
 }

@@ -51,11 +51,10 @@ LLFFFLFLFL
 	err := Run(reader, buf)
 	assert.NoError(t, err)
 	actual := string(buf.Bytes())
-	// assert.Equal(t, "2 3 S\n", actual)
 	assert.Equal(t, "2 4 S LOST\n", actual)
 }
 
-func TestRun_Combined(t *testing.T) {
+func TestRun_RoverIgnoresLostCommands(t *testing.T) {
 	input := `5 3
 1 1 E
 RFRFRFRF
@@ -71,6 +70,5 @@ LLFFFLFLFL
 	err := Run(reader, buf)
 	assert.NoError(t, err)
 	actual := string(buf.Bytes())
-	//assert.Equal(t, "1 1 E\n3 3 N LOST\n2 3 S\n", actual)
-	assert.Equal(t, "1 1 E\n3 3 N LOST\n2 4 S LOST\n", actual)
+	assert.Equal(t, "1 1 E\n3 3 N LOST\n2 3 S\n", actual)
 }
