@@ -2,7 +2,6 @@ package mars
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 )
