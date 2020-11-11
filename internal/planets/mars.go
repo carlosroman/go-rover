@@ -1,4 +1,4 @@
-package mars
+package planets
 
 import (
 	"errors"
@@ -13,17 +13,7 @@ var (
 
 const maxMars = 50
 
-// Mars represents a planet
-type Mars interface {
-	// UpperRight returns the top right co-ordinate
-	UpperRight() (x, y uint8)
-	// IsValidLocation check to see if location valid
-	IsValidLocation(x, y uint8) (valid bool)
-	// MarkLocation returns true if never marked before
-	MarkLocation(x, y uint8) (successful bool)
-}
-
-func NewMars(input string) (err error, mars Mars) {
+func NewMars(input string) (err error, planet Planet) {
 	split := strings.Split(input, " ")
 
 	parsedX, err := strconv.ParseUint(split[0], 10, 8)
@@ -42,30 +32,30 @@ func NewMars(input string) (err error, mars Mars) {
 		return InvalidUpperRightErr, nil
 	}
 
-	return nil, &planet{
+	return nil, &mars{
 		x:         uint8(parsedX),
 		y:         uint8(parsedY),
 		markStore: make(map[string]struct{}),
 	}
 }
 
-type planet struct {
+type mars struct {
 	x, y      uint8
 	markStore map[string]struct{}
 }
 
-func (p planet) UpperRight() (x, y uint8) {
+func (p mars) UpperRight() (x, y uint8) {
 	return p.x, p.y
 }
 
-func (p planet) IsValidLocation(x, y uint8) (valid bool) {
+func (p mars) IsValidLocation(x, y uint8) (valid bool) {
 	if x <= p.x && y <= p.y {
 		return true
 	}
 	return false
 }
 
-func (p *planet) MarkLocation(x, y uint8) (successful bool) {
+func (p *mars) MarkLocation(x, y uint8) (successful bool) {
 	key := fmt.Sprintf("%v,%v", x, y)
 	if _, ok := p.markStore[key]; ok {
 		return false

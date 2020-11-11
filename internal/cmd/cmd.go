@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/carlosroman/go-rover/internal/mars"
+	"github.com/carlosroman/go-rover/internal/planets"
 )
 
 func Run(reader *bufio.Reader, out io.Writer) error {
@@ -34,7 +34,7 @@ func Run(reader *bufio.Reader, out io.Writer) error {
 	}
 }
 
-func move(rover Rover, mars mars.Mars, reader *bufio.Reader, out io.Writer) error {
+func move(rover Rover, mars planets.Planet, reader *bufio.Reader, out io.Writer) error {
 	text, err := reader.ReadString('\n')
 	if err != nil {
 		return err
@@ -72,12 +72,12 @@ func getRover(reader *bufio.Reader) (error, Rover) {
 
 }
 
-func getMap(reader *bufio.Reader) (error, mars.Mars) {
+func getMap(reader *bufio.Reader) (error, planets.Planet) {
 	text, err := reader.ReadString('\n')
 	if err != nil {
 		return err, nil
 	}
-	err, m := mars.NewMars(trimSuffix(text))
+	err, m := planets.NewMars(trimSuffix(text))
 	if err != nil {
 		return err, nil
 	}

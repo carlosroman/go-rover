@@ -1,9 +1,9 @@
-package mars_test
+package planets_test
 
 import (
 	"testing"
 
-	"github.com/carlosroman/go-rover/internal/mars"
+	"github.com/carlosroman/go-rover/internal/planets"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -16,13 +16,13 @@ func TestNewMars(t *testing.T) {
 		expectedErr          error
 	}{
 		{name: "simple", input: "5 5", expectedX: 5, expectedY: 5},
-		{name: "invalidX", input: "51 5", expectedErr: mars.InvalidUpperRightErr},
-		{name: "invalidY", input: "6 51", expectedErr: mars.InvalidUpperRightErr},
+		{name: "invalidX", input: "51 5", expectedErr: planets.InvalidUpperRightErr},
+		{name: "invalidY", input: "6 51", expectedErr: planets.InvalidUpperRightErr},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err, m := mars.NewMars(test.input)
+			err, m := planets.NewMars(test.input)
 			if test.expectedErr != nil {
 				require.Error(t, err)
 				return
@@ -37,7 +37,7 @@ func TestNewMars(t *testing.T) {
 }
 
 func TestPlanet_IsValidLocation(t *testing.T) {
-	err, m := mars.NewMars("5 5")
+	err, m := planets.NewMars("5 5")
 	require.NoError(t, err)
 	tests := []struct {
 		name          string
@@ -61,7 +61,7 @@ func TestPlanet_IsValidLocation(t *testing.T) {
 }
 
 func TestPlanet_MarkLocation(t *testing.T) {
-	err, m := mars.NewMars("5 5")
+	err, m := planets.NewMars("5 5")
 	require.NoError(t, err)
 	assert.True(t, m.MarkLocation(6, 6))
 	assert.False(t, m.MarkLocation(6, 6))
