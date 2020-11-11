@@ -9,7 +9,8 @@ import (
 type Orientation rune
 type Direction rune
 
-var InvalidOrientation = errors.New("invalid Orientation")
+var InvalidOrientation = errors.New("invalid orientation")
+var InvalidDirection = errors.New("invalid direction")
 
 const (
 	North = Orientation('N')
@@ -23,7 +24,7 @@ const (
 )
 
 type Rover interface {
-	Move(direction Direction) (x, y int8)
+	Move(direction Direction) (x, y int8, err error)
 	Orientation() Orientation
 	Reverse() (x, y int8)
 }
@@ -37,7 +38,11 @@ func (r rover) Orientation() Orientation {
 	return r.orientation
 }
 
-func (r *rover) Move(direction Direction) (x, y int8) {
+func (r *rover) Move(direction Direction) (x, y int8, err error) {
+	if (direction != Left) && (direction != Right) && (direction != Forward) {
+		return 0, 0, InvalidDirection
+	}
+
 	if direction == Left {
 		switch r.orientation {
 		case North:
@@ -49,7 +54,7 @@ func (r *rover) Move(direction Direction) (x, y int8) {
 		case East:
 			r.orientation = North
 		}
-		return r.x, r.y
+		return r.x, r.y, err
 	}
 
 	if direction == Right {
@@ -63,7 +68,7 @@ func (r *rover) Move(direction Direction) (x, y int8) {
 		case West:
 			r.orientation = North
 		}
-		return r.x, r.y
+		return r.x, r.y, err
 	}
 
 	switch r.orientation {
@@ -76,7 +81,7 @@ func (r *rover) Move(direction Direction) (x, y int8) {
 	case West:
 		r.x--
 	}
-	return r.x, r.y
+	return r.x, r.y, err
 }
 
 func (r *rover) Reverse() (x, y int8) {
@@ -97,15 +102,15 @@ func NewRover(x, y int8, orientation Orientation) Rover {
 	return &rover{x: x, y: y, orientation: orientation}
 }
 
-func NewRoverFromString(input string) (err error, r Rover) {
+func NewRoverFromString(input string) (r Rover, err error) {
 	split := strings.Split(input, " ")
 	parsedX, err := strconv.ParseUint(split[0], 10, 8)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 	parsedY, err := strconv.ParseUint(split[1], 10, 8)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 	var orientation Orientation
 	switch split[2] {
@@ -118,7 +123,7 @@ func NewRoverFromString(input string) (err error, r Rover) {
 	case "W":
 		orientation = West
 	default:
-		return InvalidOrientation, nil
+		return nil, InvalidOrientation
 	}
-	return nil, NewRover(int8(parsedX), int8(parsedY), orientation)
+	return NewRover(int8(parsedX), int8(parsedY), orientation), nil
 }

@@ -42,7 +42,10 @@ func move(rover Rover, mars planets.Planet, reader *bufio.Reader, out io.Writer)
 	var x, y int8
 	var lost string
 	for i := range trimSuffix(text) {
-		x, y = rover.Move(Direction(text[i]))
+		x, y, err = rover.Move(Direction(text[i]))
+		if err != nil {
+			return err
+		}
 		if !mars.IsValidLocation(uint8(x), uint8(y)) {
 			if mars.MarkLocation(uint8(x), uint8(y)) {
 				lost = "LOST"
@@ -64,7 +67,7 @@ func getRover(reader *bufio.Reader) (error, Rover) {
 		return err, nil
 	}
 
-	err, r := NewRoverFromString(trimSuffix(text))
+	r, err := NewRoverFromString(trimSuffix(text))
 	if err != nil {
 		return err, nil
 	}

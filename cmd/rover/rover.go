@@ -11,7 +11,7 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	if err := cmd.Run(reader, os.Stdout); err != nil {
-		fmt.Println(err)
+		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }

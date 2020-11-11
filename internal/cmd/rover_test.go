@@ -28,7 +28,8 @@ func Test_RoverMove(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			r := cmd.NewRover(startingPoint, startingPoint, test.startingOrientation)
-			actualX, actualY := r.Move(test.move)
+			actualX, actualY, err := r.Move(test.move)
+			require.NoError(t, err)
 			assert.Equal(t, test.expectedX, actualX)
 			assert.Equal(t, test.expectedY, actualY)
 			if test.expectedOrientation > 0 {
@@ -45,7 +46,7 @@ func TestRover_Reverse(t *testing.T) {
 	for _, f := range []cmd.Orientation{cmd.North, cmd.East, cmd.South, cmd.West} {
 		t.Run(string(f), func(t *testing.T) {
 			r := cmd.NewRover(startingPoint, startingPoint, f)
-			_, _ = r.Move(cmd.Forward)
+			_, _, _ = r.Move(cmd.Forward)
 			x, y := r.Reverse()
 			assert.Equal(t, int8(5), x)
 			assert.Equal(t, int8(5), y)
@@ -57,7 +58,7 @@ func Test_RoverTurnLeft(t *testing.T) {
 	startingPoint := int8(5)
 	r := cmd.NewRover(startingPoint, startingPoint, cmd.North)
 	for i, expected := range []cmd.Orientation{cmd.West, cmd.South, cmd.East, cmd.North} {
-		_, _ = r.Move(cmd.Left)
+		_, _, _ = r.Move(cmd.Left)
 		actual := r.Orientation
 		require.Equal(t, expected, actual(), fmt.Sprintf("Expected[%v]: %s but got %s", i, string(expected), string(actual())))
 	}
@@ -67,10 +68,19 @@ func Test_RoverTurnRight(t *testing.T) {
 	startingPoint := int8(5)
 	r := cmd.NewRover(startingPoint, startingPoint, cmd.North)
 	for i, expected := range []cmd.Orientation{cmd.East, cmd.South, cmd.West, cmd.North} {
-		_, _ = r.Move(cmd.Right)
+		_, _, _ = r.Move(cmd.Right)
 		actual := r.Orientation
 		require.Equal(t, expected, actual(), fmt.Sprintf("Expected[%v]: %s but got %s", i, string(expected), string(actual())))
 	}
+}
+
+func TestRover_MoveInvalid(t *testing.T) {
+	startingPoint := int8(5)
+	r := cmd.NewRover(startingPoint, startingPoint, cmd.North)
+	x, y, err := r.Move(cmd.Direction('w'))
+	assert.Equal(t, int8(0), x)
+	assert.Equal(t, int8(0), y)
+	assert.Equal(t, cmd.InvalidDirection, err)
 }
 
 func Test_NewRover(t *testing.T) {
@@ -87,18 +97,19 @@ func Test_NewRover(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			err, r := cmd.NewRoverFromString(test.name)
+			r, err := cmd.NewRoverFromString(test.name)
 			require.NoError(t, err)
 			assert.Equal(t, test.expectedOrientation, r.Orientation())
 			// rotate to get current location
-			x, y := r.Move(cmd.Left)
+			x, y, err := r.Move(cmd.Left)
+			assert.NoError(t, err)
 			assert.Equal(t, test.expectedX, x)
 			assert.Equal(t, test.expectedY, y)
 		})
 	}
 
 	t.Run("InvalidOrientation", func(t *testing.T) {
-		err, _ := cmd.NewRoverFromString("4 1 X")
+		_, err := cmd.NewRoverFromString("4 1 X")
 		require.Error(t, err)
 	})
 }
