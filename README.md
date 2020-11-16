@@ -10,6 +10,7 @@ A simple implementation of the martian robots kata.
     - [Quick start](#quick-start)
     - [Running the application without Docker](#running-the-application-without-docker)
     - [Building standalone binary](#building-standalone-binary)
+- [Controlling Rover](#controlling-rover)
 - [Development](#development)
 
 ## Getting Started
@@ -62,6 +63,51 @@ make build
 
 After the command has finished you'll have a binary called `rover` in directory called `bin`.
 By default, this binary will be built to run on the local OS and architecture.
+
+## Controlling Rover
+
+When the programme starts you'll have to enter the upper-right coordinates of the rectangular world.
+The maximum `x` or `y` value is 50.
+So the biggest box you can build would be:
+
+```
+50 50
+```
+
+The next input is Rovers location and orientation.
+This is inputed as the `x` and `y` position of the robot followed by the orientation.
+The orientation is inputed as either `N`, `S`, `E` or `W`.
+This would look as follows if `x` was 10, `y` 20 and Rover is facing West:
+
+```
+10 20 W
+```
+
+The next input will be the instructions for Rover's movement.
+Their instruction is a string of the letters `L`, `R`, and `F` on one line.
+So for example if you wanted Rover to move forward twice, then turn left, forward one more time and then turn right, it would look as follows:
+
+```
+FFLFR
+```
+
+After Rover's commands are processed it will output their final location.
+They will also inform you if they are lost.
+Rover will become lost once they leave the bounds of the grid.
+
+A lost rover:
+
+```
+53
+3 2 N
+FRRFLLFFRRFLL
+```
+
+Will output:
+
+```
+3 3 N LOST
+```
 
 ## Development
 
