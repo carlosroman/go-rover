@@ -1,7 +1,7 @@
 # go-rover
 A simple implementation of the martian robots kata.
 ![Build](https://github.com/carlosroman/go-rover/workflows/Run%20tests/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/carlosroman/go-rover/badge.svg?branch=master)](https://coveralls.io/github/carlosroman/go-rover?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/carlosroman/go-rover/badge.svg?branch=main)](https://coveralls.io/github/carlosroman/go-rover?branch=master)
 ---
 
 ## Table of Contents
