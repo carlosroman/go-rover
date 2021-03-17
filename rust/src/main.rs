@@ -1,6 +1,6 @@
+mod domain;
 mod error;
 mod input;
-mod mars;
 
 fn main() {
     println!("Hello, world!");
