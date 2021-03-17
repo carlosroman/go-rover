@@ -1,4 +1,4 @@
-use crate::domain::{Mars, Orientation, Rover};
+use crate::domain::{Instructions, Mars, Orientation, Rover};
 use crate::error::AppError;
 use std::io;
 use std::str::FromStr;
@@ -32,6 +32,25 @@ fn parse<T: FromStr>(text: Option<&str>) -> Result<T, String> {
         },
     };
     Ok(x)
+}
+
+pub fn get_instructions(reader: &mut dyn io::BufRead) -> Result<Vec<Instructions>, AppError> {
+    let mut buf = String::new();
+    match reader.read_line(&mut buf) {
+        Err(_e) => return Err(AppError::IOReadError),
+        Ok(n) => println!("Read {} bytes", n),
+    }
+    let mut instructions = Vec::new();
+    let buf = buf.trim();
+    for c in buf.chars() {
+        let i = match c.to_string().parse::<Instructions>() {
+            Ok(i) => i,
+            Err(_e) => return Err(AppError::IOReadError),
+        };
+        instructions.push(i);
+    }
+
+    Ok(instructions)
 }
 
 pub fn get_rover(reader: &mut dyn io::BufRead) -> Result<Rover, AppError> {
@@ -151,5 +170,22 @@ mod tests {
         let actual = get_rover(&mut text);
         assert!(actual.is_err());
         assert_eq!(AppError::BadOrientation, actual.unwrap_err());
+    }
+
+    #[test]
+    fn test_get_instructions_valid() {
+        let mut text = "RFLLFR\nignore".as_bytes();
+        let actual = get_instructions(&mut text).unwrap();
+        assert_eq!(
+            actual,
+            vec![
+                Instructions::R,
+                Instructions::F,
+                Instructions::L,
+                Instructions::L,
+                Instructions::F,
+                Instructions::R,
+            ]
+        );
     }
 }

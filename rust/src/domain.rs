@@ -32,6 +32,25 @@ impl FromStr for Orientation {
     }
 }
 
+#[derive(PartialEq, Debug)]
+pub enum Instructions {
+    L,
+    R,
+    F,
+}
+
+impl FromStr for Instructions {
+    type Err = ();
+    fn from_str(input: &str) -> Result<Instructions, Self::Err> {
+        match input {
+            "L" => Ok(Instructions::L),
+            "R" => Ok(Instructions::R),
+            "F" => Ok(Instructions::F),
+            _ => Err(()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -54,5 +73,20 @@ mod tests {
     #[test]
     fn test_orientation_e() {
         assert_eq!("E".parse::<Orientation>().unwrap(), Orientation::E);
+    }
+
+    #[test]
+    fn test_instructions_l() {
+        assert_eq!("L".parse::<Instructions>().unwrap(), Instructions::L);
+    }
+
+    #[test]
+    fn test_instructions_r() {
+        assert_eq!("R".parse::<Instructions>().unwrap(), Instructions::R);
+    }
+
+    #[test]
+    fn test_instructions_f() {
+        assert_eq!("F".parse::<Instructions>().unwrap(), Instructions::F);
     }
 }
