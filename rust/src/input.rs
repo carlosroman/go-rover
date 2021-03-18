@@ -7,7 +7,7 @@ pub fn get_mars(reader: &mut dyn io::BufRead) -> Result<Mars, AppError> {
     let mut buf = String::new();
     match reader.read_line(&mut buf) {
         Err(_e) => return Err(AppError::IOReadError),
-        Ok(n) => println!("Read {} bytes", n),
+        Ok(_n) => {}
     }
     let mut text = buf.trim().split_whitespace();
     let x = match parse(text.next()) {
@@ -36,7 +36,7 @@ pub fn get_instructions(reader: &mut dyn io::BufRead) -> Result<Vec<Instructions
     let mut buf = String::new();
     match reader.read_line(&mut buf) {
         Err(_e) => return Err(AppError::IOReadError),
-        Ok(n) => println!("Read {} bytes", n),
+        Ok(_n) => {}
     }
     let mut instructions = Vec::new();
     let buf = buf.trim();
@@ -55,7 +55,7 @@ pub fn get_rover(reader: &mut dyn io::BufRead) -> Result<Rover, AppError> {
     let mut buf = String::new();
     match reader.read_line(&mut buf) {
         Err(_e) => return Err(AppError::IOReadError),
-        Ok(n) => println!("Read {} bytes", n),
+        Ok(_n) => {}
     }
     let mut text = buf.trim().split_whitespace();
     let x = match parse(text.next()) {
