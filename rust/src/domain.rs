@@ -33,7 +33,8 @@ impl Mars {
                 Orientation::S => res.location.1 = r.location.1 - 1,
                 Orientation::W => res.location.0 = r.location.0 - 1,
             },
-            _ => return Err(AppError::BadCoordinates),
+            Instructions::L => res.orientation = r.orientation.rotate_left(),
+            Instructions::R => res.orientation = r.orientation.rotate_right(),
         }
         Ok(res)
     }
@@ -57,9 +58,28 @@ impl Rover {
 #[derive(PartialEq, Clone, Debug)]
 pub enum Orientation {
     N,
-    W,
-    S,
     E,
+    S,
+    W,
+}
+
+impl Orientation {
+    fn rotate_left(&self) -> Orientation {
+        match self {
+            Orientation::N => Orientation::W,
+            Orientation::E => Orientation::N,
+            Orientation::S => Orientation::E,
+            Orientation::W => Orientation::S,
+        }
+    }
+    fn rotate_right(&self) -> Orientation {
+        match self {
+            Orientation::N => Orientation::E,
+            Orientation::E => Orientation::S,
+            Orientation::S => Orientation::W,
+            Orientation::W => Orientation::N,
+        }
+    }
 }
 
 impl FromStr for Orientation {
@@ -163,5 +183,21 @@ mod tests {
         let r = Rover::new(Coordinate::new(3, 3), Orientation::W);
         let actual = m.move_rover(r, Instructions::F).unwrap();
         assert_eq!(actual, Rover::new(Coordinate::new(2, 3), Orientation::W));
+    }
+
+    #[test]
+    fn test_mars_move_rover_right() {
+        let m = Mars::new(Coordinate::new(5, 5));
+        let r = Rover::new(Coordinate::new(3, 3), Orientation::N);
+        let actual = m.move_rover(r, Instructions::R).unwrap();
+        assert_eq!(actual, Rover::new(Coordinate::new(3, 3), Orientation::E));
+    }
+
+    #[test]
+    fn test_mars_move_rover_left() {
+        let m = Mars::new(Coordinate::new(5, 5));
+        let r = Rover::new(Coordinate::new(3, 3), Orientation::N);
+        let actual = m.move_rover(r, Instructions::L).unwrap();
+        assert_eq!(actual, Rover::new(Coordinate::new(3, 3), Orientation::W));
     }
 }
