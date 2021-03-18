@@ -1,15 +1,11 @@
-# go-rover
-A simple implementation of the martian robots kata.
-![Build](https://github.com/carlosroman/go-rover/workflows/Run%20tests/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/carlosroman/go-rover/badge.svg?branch=main)](https://coveralls.io/github/carlosroman/go-rover?branch=master)
+# Mars Rover
+This is a set of implementations of the Mars Rover programming kata.
 ---
 
 ## Table of Contents
 
 - [Getting Started](#getting-started)
     - [Quick start](#quick-start)
-    - [Running the application without Docker](#running-the-application-without-docker)
-    - [Building standalone binary](#building-standalone-binary)
 - [Controlling Rover](#controlling-rover)
 - [Development](#development)
 
@@ -18,8 +14,8 @@ A simple implementation of the martian robots kata.
 First clone this repo and cd into the directory:
 
 ```
-git clone https://github.com/carlosroman/go-rover.git
-cd go-rover
+git clone https://github.com/carlosroman/mars-rover.git
+cd mars-rover
 ```
 
 ### Quick start
@@ -29,40 +25,14 @@ For the quickest start you just need:
 * Make
 * Docker
 
-With those two items you can then just run the following to start the application:
+With those two items you can then just run the following to start the application.
+To quick start to the golang version run:
 
 ```
-make quick-start
+make quick-start/go
 ```
 
 You should see some out put on the console and once everything stops you should be ready to start providing input.
-
-### Running the application without Docker
-
-If you want to run the application without Docker, then you need the following:
-
-* Make
-* Golang 1.4+
-
-The application can then be run by using the following command
-
-```
-make start
-```
-
-### Building standalone binary
-
-If you want to run the application without Docker, then you need the following:
-
-* Make
-* Golang 1.4+
-
-```
-make build
-```
-
-After the command has finished you'll have a binary called `rover` in directory called `bin`.
-By default, this binary will be built to run on the local OS and architecture.
 
 ## Controlling Rover
 
@@ -114,5 +84,6 @@ Will output:
 The simplest way to run the unit tests for this project is:
 
 ```
+cd <language>
 make test
 ```
