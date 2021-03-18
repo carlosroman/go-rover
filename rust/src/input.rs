@@ -70,10 +70,7 @@ pub fn get_rover(reader: &mut dyn io::BufRead) -> Result<Rover, AppError> {
         Ok(x) => x,
         Err(_e) => return Err(AppError::BadOrientation),
     };
-    Ok(Rover {
-        location: Coordinate::new(x, y),
-        orientation: o,
-    })
+    Ok(Rover::new(Coordinate::new(x, y), o))
 }
 
 #[cfg(test)]
