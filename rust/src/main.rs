@@ -2,7 +2,6 @@ mod domain;
 mod error;
 mod input;
 use std::io;
-use std::str;
 
 fn main() {
     let stdin = io::stdin();
@@ -46,6 +45,7 @@ fn run_process(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::str;
 
     #[test]
     fn test_run_process() {
