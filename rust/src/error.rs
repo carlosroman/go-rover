@@ -8,6 +8,8 @@ pub enum AppError {
     BadCoordinates,
     #[error("Bad Orientation")]
     BadOrientation,
+    #[error("Rover is lost")]
+    RoverLost,
 }
 
 #[cfg(test)]
@@ -30,5 +32,11 @@ mod tests {
     fn test_app_bad_orientation() {
         println!("Error: {:?}", AppError::BadOrientation);
         assert_eq!("Bad Orientation", AppError::BadOrientation.to_string());
+    }
+
+    #[test]
+    fn test_app_rover_lost() {
+        println!("Error: {:?}", AppError::RoverLost);
+        assert_eq!("Rover is lost", AppError::RoverLost.to_string());
     }
 }

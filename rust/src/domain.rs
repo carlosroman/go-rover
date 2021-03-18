@@ -1,10 +1,18 @@
 use crate::error::AppError;
+use std::cmp::{Ord, Ordering};
+use std::collections::BTreeMap;
 use std::str::FromStr;
 
-#[derive(PartialEq, Debug)]
+#[derive(Eq, PartialEq, PartialOrd, Clone, Debug)]
 pub struct Coordinate {
     pub x: i64,
     pub y: i64,
+}
+
+impl Ord for Coordinate {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.x.cmp(&other.x).then(self.y.cmp(&other.y))
+    }
 }
 
 impl Coordinate {
@@ -15,41 +23,49 @@ impl Coordinate {
 
 #[derive(PartialEq, Debug)]
 pub struct Mars {
-    pub upper_right: (i64, i64),
+    pub upper_right: Coordinate,
+    scent_map: BTreeMap<Coordinate, bool>,
 }
 
 impl Mars {
     pub fn new(co: Coordinate) -> Mars {
         Mars {
-            upper_right: (co.x, co.y),
+            upper_right: co,
+            scent_map: BTreeMap::new(),
         }
     }
-    pub fn move_rover(&self, r: Rover, instruction: Instructions) -> Result<Rover, AppError> {
+    pub fn move_rover(&mut self, r: Rover, instruction: Instructions) -> Result<Rover, AppError> {
         let mut res = r.clone();
         match instruction {
             Instructions::F => match r.orientation {
-                Orientation::N => res.location.1 = r.location.1 + 1,
-                Orientation::E => res.location.0 = r.location.0 + 1,
-                Orientation::S => res.location.1 = r.location.1 - 1,
-                Orientation::W => res.location.0 = r.location.0 - 1,
+                Orientation::N => res.location.y = r.location.y + 1,
+                Orientation::E => res.location.x = r.location.x + 1,
+                Orientation::S => res.location.y = r.location.y - 1,
+                Orientation::W => res.location.x = r.location.x - 1,
             },
             Instructions::L => res.orientation = r.orientation.rotate_left(),
             Instructions::R => res.orientation = r.orientation.rotate_right(),
         }
-        Ok(res)
+        if res.location.x <= self.upper_right.x && res.location.y <= self.upper_right.y {
+            return Ok(res);
+        }
+        match self.scent_map.insert(r.location.clone(), true) {
+            None => Err(AppError::RoverLost),
+            _ => Ok(r),
+        }
     }
 }
 
 #[derive(PartialEq, Clone, Debug)]
 pub struct Rover {
-    pub location: (i64, i64),
+    pub location: Coordinate,
     pub orientation: Orientation,
 }
 
 impl Rover {
     pub fn new(loc: Coordinate, o: Orientation) -> Rover {
         Rover {
-            location: (loc.x, loc.y),
+            location: loc,
             orientation: o,
         }
     }
@@ -155,7 +171,7 @@ mod tests {
 
     #[test]
     fn test_mars_move_rover_forward_n() {
-        let m = Mars::new(Coordinate::new(5, 5));
+        let mut m = Mars::new(Coordinate::new(5, 5));
         let r = Rover::new(Coordinate::new(3, 3), Orientation::N);
         let actual = m.move_rover(r, Instructions::F).unwrap();
         assert_eq!(actual, Rover::new(Coordinate::new(3, 4), Orientation::N));
@@ -163,7 +179,7 @@ mod tests {
 
     #[test]
     fn test_mars_move_rover_forward_e() {
-        let m = Mars::new(Coordinate::new(5, 5));
+        let mut m = Mars::new(Coordinate::new(5, 5));
         let r = Rover::new(Coordinate::new(3, 3), Orientation::E);
         let actual = m.move_rover(r, Instructions::F).unwrap();
         assert_eq!(actual, Rover::new(Coordinate::new(4, 3), Orientation::E));
@@ -171,7 +187,7 @@ mod tests {
 
     #[test]
     fn test_mars_move_rover_forward_s() {
-        let m = Mars::new(Coordinate::new(5, 5));
+        let mut m = Mars::new(Coordinate::new(5, 5));
         let r = Rover::new(Coordinate::new(3, 3), Orientation::S);
         let actual = m.move_rover(r, Instructions::F).unwrap();
         assert_eq!(actual, Rover::new(Coordinate::new(3, 2), Orientation::S));
@@ -179,7 +195,7 @@ mod tests {
 
     #[test]
     fn test_mars_move_rover_forward_w() {
-        let m = Mars::new(Coordinate::new(5, 5));
+        let mut m = Mars::new(Coordinate::new(5, 5));
         let r = Rover::new(Coordinate::new(3, 3), Orientation::W);
         let actual = m.move_rover(r, Instructions::F).unwrap();
         assert_eq!(actual, Rover::new(Coordinate::new(2, 3), Orientation::W));
@@ -187,7 +203,7 @@ mod tests {
 
     #[test]
     fn test_mars_move_rover_right() {
-        let m = Mars::new(Coordinate::new(5, 5));
+        let mut m = Mars::new(Coordinate::new(5, 5));
         let r = Rover::new(Coordinate::new(3, 3), Orientation::N);
         let actual = m.move_rover(r, Instructions::R).unwrap();
         assert_eq!(actual, Rover::new(Coordinate::new(3, 3), Orientation::E));
@@ -195,9 +211,39 @@ mod tests {
 
     #[test]
     fn test_mars_move_rover_left() {
-        let m = Mars::new(Coordinate::new(5, 5));
+        let mut m = Mars::new(Coordinate::new(5, 5));
         let r = Rover::new(Coordinate::new(3, 3), Orientation::N);
         let actual = m.move_rover(r, Instructions::L).unwrap();
         assert_eq!(actual, Rover::new(Coordinate::new(3, 3), Orientation::W));
+    }
+
+    #[test]
+    fn test_mars_move_forward_fails() {
+        let mut m = Mars::new(Coordinate::new(5, 5));
+        let r = Rover::new(Coordinate::new(5, 5), Orientation::N);
+        let actual = m.move_rover(r, Instructions::F);
+        assert!(actual.is_err());
+        assert_eq!(AppError::RoverLost, actual.unwrap_err());
+    }
+
+    #[test]
+    fn test_mars_move_forward_over_scent() {
+        // Given mars
+        let mut m = Mars::new(Coordinate::new(5, 5));
+        // And rover on edge
+        let r1 = Rover::new(Coordinate::new(5, 5), Orientation::N);
+
+        // When rover moves off map
+        let _ignore = m.move_rover(r1, Instructions::F);
+
+        // Then next time rover moves off map last postion returned
+        let r2 = Rover::new(Coordinate::new(5, 5), Orientation::N);
+        let actual = m.move_rover(r2, Instructions::F).unwrap();
+        assert_eq!(actual, Rover::new(Coordinate::new(5, 5), Orientation::N));
+
+        // And even if move repeated
+        let r3 = Rover::new(Coordinate::new(5, 5), Orientation::N);
+        let actual = m.move_rover(r3, Instructions::F).unwrap();
+        assert_eq!(actual, Rover::new(Coordinate::new(5, 5), Orientation::N));
     }
 }

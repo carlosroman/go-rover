@@ -1,4 +1,4 @@
-use crate::domain::{Instructions, Mars, Orientation, Rover};
+use crate::domain::{Coordinate, Instructions, Mars, Orientation, Rover};
 use crate::error::AppError;
 use std::io;
 use std::str::FromStr;
@@ -18,9 +18,7 @@ pub fn get_mars(reader: &mut dyn io::BufRead) -> Result<Mars, AppError> {
         Ok(x) => x,
         Err(_e) => return Err(AppError::BadCoordinates),
     };
-    Ok(Mars {
-        upper_right: (x, y),
-    })
+    Ok(Mars::new(Coordinate::new(x, y)))
 }
 
 fn parse<T: FromStr>(text: Option<&str>) -> Result<T, String> {
@@ -73,7 +71,7 @@ pub fn get_rover(reader: &mut dyn io::BufRead) -> Result<Rover, AppError> {
         Err(_e) => return Err(AppError::BadOrientation),
     };
     Ok(Rover {
-        location: (x, y),
+        location: Coordinate::new(x, y),
         orientation: o,
     })
 }
@@ -86,12 +84,7 @@ mod tests {
     fn test_get_mars_good_input_for_get_mars() {
         let mut text = "5 1\nignore".as_bytes();
         let actual = get_mars(&mut text).unwrap();
-        assert_eq!(
-            actual,
-            Mars {
-                upper_right: (5, 1)
-            }
-        );
+        assert_eq!(actual, Mars::new(Coordinate::new(5, 1)),);
     }
 
     #[test]
@@ -130,7 +123,7 @@ mod tests {
         assert_eq!(
             actual,
             Rover {
-                location: (10, 20),
+                location: Coordinate::new(10, 20),
                 orientation: Orientation::E,
             }
         );
