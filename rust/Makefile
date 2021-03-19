@@ -1,5 +1,10 @@
 CARGO_BIN			?= cargo
 DOCKER_BIN			?= docker
+RUST_VERSION		?= 1.50.0
+
+RUST_DOCKER_CMD		?= $(DOCKER_BIN) run --rm -it -v ${CURDIR}:/app -w /app rust:${RUST_VERSION}
+DOCKER_TARGET_CMD	= $(word 2, $(subst /, ,$(@)))
+CI_CMD				?= $(RUST_DOCKER_CMD) make $(DOCKER_TARGET_CMD)
 
 .PHONY : fmt
 fmt :
@@ -18,7 +23,7 @@ quick-start :
 	@printf '\n================================================================\n'
 	@printf 'Target: quick-start'
 	@printf '\n================================================================\n'
-	$(DOCKER_BIN) run --rm -it -v ${CURDIR}:/app -w /app rust:1.50.0 make start
+	@($(RUST_DOCKER_CMD) make start)
 
 
 target/release/rover :
@@ -29,3 +34,22 @@ build: target/release/rover
 .PHONY : lint
 lint :
 	@($(CARGO_BIN) clippy)
+
+.PHONY : all
+all : fmt lint test build
+
+.PHONY : ci/test
+ci/test :
+	@($(CI_CMD))
+
+.PHONY : ci/build
+ci/build :
+	@($(CI_CMD))
+
+.PHONY : ci/lint
+ci/lint :
+	@($(CI_CMD))
+
+.PHONY : ci/all
+ci/all :
+	@($(CI_CMD))
