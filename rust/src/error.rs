@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-#[derive(Error, PartialEq, Debug)]
+#[derive(Error, PartialEq, Eq, Debug, Copy, Clone)]
 pub enum AppError {
     #[error("IO Read Error")]
     IOReadError,
@@ -8,6 +8,8 @@ pub enum AppError {
     BadCoordinates,
     #[error("Bad Orientation")]
     BadOrientation,
+    #[error("BadInput")]
+    BadInput,
     #[error("Rover is lost")]
     RoverLost,
 }

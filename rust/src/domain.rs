@@ -93,14 +93,14 @@ impl Orientation {
 }
 
 impl FromStr for Orientation {
-    type Err = ();
-    fn from_str(input: &str) -> Result<Orientation, Self::Err> {
+    type Err = AppError;
+    fn from_str(input: &str) -> Result<Orientation, AppError> {
         match input {
             "N" => Ok(Orientation::N),
             "W" => Ok(Orientation::W),
             "S" => Ok(Orientation::S),
             "E" => Ok(Orientation::E),
-            _ => Err(()),
+            _ => Err(AppError::BadOrientation),
         }
     }
 }
@@ -113,13 +113,13 @@ pub enum Instructions {
 }
 
 impl FromStr for Instructions {
-    type Err = ();
-    fn from_str(input: &str) -> Result<Instructions, Self::Err> {
+    type Err = AppError;
+    fn from_str(input: &str) -> Result<Instructions, AppError> {
         match input {
             "L" => Ok(Instructions::L),
             "R" => Ok(Instructions::R),
             "F" => Ok(Instructions::F),
-            _ => Err(()),
+            _ => Err(AppError::BadInput),
         }
     }
 }

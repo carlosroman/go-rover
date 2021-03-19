@@ -1,4 +1,4 @@
-use crate::domain::{Coordinate, Instructions, Mars, Orientation, Rover};
+use crate::domain::{Coordinate, Instructions, Mars,Rover};
 use crate::error::AppError;
 use std::io;
 use std::str::FromStr;
@@ -10,23 +10,18 @@ pub fn get_mars(reader: &mut dyn io::BufRead) -> Result<Mars, AppError> {
         Ok(_n) => {}
     }
     let mut text = buf.trim().split_whitespace();
-    let x = match parse(text.next()) {
-        Ok(x) => x,
-        Err(_e) => return Err(AppError::BadCoordinates),
-    };
-    let y = match parse(text.next()) {
-        Ok(x) => x,
-        Err(_e) => return Err(AppError::BadCoordinates),
-    };
+    let x = parse(text.next())?;
+    let y = parse(text.next())?;
     Ok(Mars::new(Coordinate::new(x, y)))
 }
 
-fn parse<T: FromStr>(text: Option<&str>) -> Result<T, String> {
+fn parse<T: FromStr>(text: Option<&str>) -> Result<T, AppError> {
     let x: T = match text {
-        None => return Err(String::from("no")),
+        None => return Err(AppError::BadInput),
         Some(t) => match t.parse::<T>() {
             Ok(x) => x,
-            Err(_e) => return Err(String::from("Could not parse T")),
+            Err(_e) =>
+                return Err(AppError::BadInput),
         },
     };
     Ok(x)
@@ -58,24 +53,16 @@ pub fn get_rover(reader: &mut dyn io::BufRead) -> Result<Rover, AppError> {
         Ok(_n) => {}
     }
     let mut text = buf.trim().split_whitespace();
-    let x = match parse(text.next()) {
-        Ok(x) => x,
-        Err(_e) => return Err(AppError::BadCoordinates),
-    };
-    let y = match parse(text.next()) {
-        Ok(x) => x,
-        Err(_e) => return Err(AppError::BadCoordinates),
-    };
-    let o: Orientation = match parse(text.next()) {
-        Ok(x) => x,
-        Err(_e) => return Err(AppError::BadOrientation),
-    };
+    let x = parse(text.next())?;
+    let y = parse(text.next())?;
+    let o =  parse(text.next())?;
     Ok(Rover::new(Coordinate::new(x, y), o))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::domain::{Orientation};
 
     #[test]
     fn test_get_mars_good_input_for_get_mars() {
@@ -102,7 +89,7 @@ mod tests {
         let mut text = "a 1\nignore".as_bytes();
         let actual = get_mars(&mut text);
         assert!(actual.is_err());
-        assert_eq!(AppError::BadCoordinates, actual.unwrap_err());
+        assert_eq!(AppError::BadInput, actual.unwrap_err());
     }
 
     #[test]
@@ -110,7 +97,7 @@ mod tests {
         let mut text = "1 a\nignore".as_bytes();
         let actual = get_mars(&mut text);
         assert!(actual.is_err());
-        assert_eq!(AppError::BadCoordinates, actual.unwrap_err());
+        assert_eq!(AppError::BadInput, actual.unwrap_err());
     }
 
     #[test]
@@ -144,7 +131,7 @@ mod tests {
         let mut text = "a 1\nignore".as_bytes();
         let actual = get_rover(&mut text);
         assert!(actual.is_err());
-        assert_eq!(AppError::BadCoordinates, actual.unwrap_err());
+        assert_eq!(AppError::BadInput, actual.unwrap_err());
     }
 
     #[test]
@@ -152,14 +139,14 @@ mod tests {
         let mut text = "1 a\nignore".as_bytes();
         let actual = get_rover(&mut text);
         assert!(actual.is_err());
-        assert_eq!(AppError::BadCoordinates, actual.unwrap_err());
+        assert_eq!(AppError::BadInput, actual.unwrap_err());
     }
     #[test]
     fn test_get_rover_bad_orientation() {
         let mut text = "1 1 a\nignore".as_bytes();
         let actual = get_rover(&mut text);
         assert!(actual.is_err());
-        assert_eq!(AppError::BadOrientation, actual.unwrap_err());
+        assert_eq!(AppError::BadInput, actual.unwrap_err());
     }
 
     #[test]
