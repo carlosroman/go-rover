@@ -57,4 +57,4 @@ ci/all : ci/dep
 
 .PHONY : ci/dep
 ci/dep :
-	@(docker build -t ci/rust -f $(CURDIR)/build/ci/Dokerfile .)
+	@(docker build -t ci/rust -f $(CURDIR)/build/ci/Dockerfile .)
