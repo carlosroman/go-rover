@@ -31,7 +31,7 @@ fn run_process(
         };
     }
     let orien = rover.orientation.clone();
-    let loc = rover.location.clone();
+    let loc = rover.location;
     let msg;
     if lost {
         msg = format!("{} {} {:?} LOST\n", loc.x, loc.y, orien);
