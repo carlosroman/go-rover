@@ -1,4 +1,4 @@
-use crate::domain::{Coordinate, Instructions, Mars,Rover};
+use crate::domain::{Coordinate, Instructions, Mars, Rover};
 use crate::error::AppError;
 use std::io;
 use std::str::FromStr;
@@ -20,8 +20,7 @@ fn parse<T: FromStr>(text: Option<&str>) -> Result<T, AppError> {
         None => return Err(AppError::BadInput),
         Some(t) => match t.parse::<T>() {
             Ok(x) => x,
-            Err(_e) =>
-                return Err(AppError::BadInput),
+            Err(_e) => return Err(AppError::BadInput),
         },
     };
     Ok(x)
@@ -38,7 +37,7 @@ pub fn get_instructions(reader: &mut dyn io::BufRead) -> Result<Vec<Instructions
     for c in buf.chars() {
         let i = match c.to_string().parse::<Instructions>() {
             Ok(i) => i,
-            Err(_e) => return Err(AppError::IOReadError),
+            Err(e) => return Err(e),
         };
         instructions.push(i);
     }
@@ -55,14 +54,14 @@ pub fn get_rover(reader: &mut dyn io::BufRead) -> Result<Rover, AppError> {
     let mut text = buf.trim().split_whitespace();
     let x = parse(text.next())?;
     let y = parse(text.next())?;
-    let o =  parse(text.next())?;
+    let o = parse(text.next())?;
     Ok(Rover::new(Coordinate::new(x, y), o))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::domain::{Orientation};
+    use crate::domain::Orientation;
 
     #[test]
     fn test_get_mars_good_input_for_get_mars() {
