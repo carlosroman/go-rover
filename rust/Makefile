@@ -25,3 +25,7 @@ target/release/rover :
 	$(CARGO_BIN) build --release
 
 build: target/release/rover
+
+.PHONY : lint
+lint :
+	@($(CARGO_BIN) clippy)
