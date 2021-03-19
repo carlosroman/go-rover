@@ -1,23 +1,17 @@
 use crate::error::AppError;
-use std::cmp::{Ord, Ordering};
+use std::cmp::Ord;
 use std::collections::BTreeMap;
 use std::str::FromStr;
 
-#[derive(Eq, PartialEq, PartialOrd, Clone, Debug)]
+#[derive(Eq, PartialEq, PartialOrd, Ord, Clone, Debug)]
 pub struct Coordinate {
     pub x: i64,
     pub y: i64,
 }
 
-impl Ord for Coordinate {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.x.cmp(&other.x).then(self.y.cmp(&other.y))
-    }
-}
-
 impl Coordinate {
     pub fn new(x: i64, y: i64) -> Coordinate {
-        Coordinate { x: x, y: y }
+        Coordinate { x, y }
     }
 }
 
