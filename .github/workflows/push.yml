@@ -42,8 +42,20 @@ jobs:
           flag-name: run-linux
           parallel: true
 
+  rust-build:
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: rust
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Running unit tests
+        run: make ci/test
+
   finish:
-    needs: [ go-build ]
+    needs: [go-build, rust-build]
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
