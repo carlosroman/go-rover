@@ -5,11 +5,15 @@ CARGO_BIN		?= cargo
 DOCKER_BIN		?= docker
 RUST_VERSION		?= 1.50.0
 
-DOCKER_TTY			?= -t
-RUST_DOCKER_CMD_ARG	?= --arg
-RUST_DOCKER_CMD		?= $(DOCKER_BIN) run --rm --user "$(CURRENT_USERID)":"$(CURRENT_GROUP)" $(DOCKER_TTY) -v $(CURDIR):/app -w /app ci/rust
-DOCKER_TARGET_CMD	= $(word 2, $(subst /, ,$(@)))
-CI_CMD				?= $(RUST_DOCKER_CMD) make $(DOCKER_TARGET_CMD)
+DOCKER_TTY				?= -t
+RUST_DOCKER_BUILD_ARG	+= --build-arg CURRENT_GROUP=$(CURRENT_GROUP)
+RUST_DOCKER_BUILD_ARG	+= --build-arg CURRENT_USERID=$(CURRENT_USERID)
+RUST_DOCKER_BUILD_ARG	+= --build-arg RUST_VERSION=$(RUST_VERSION)
+RUST_DOCKER_CMD			?= $(DOCKER_BIN) run --rm --user "$(CURRENT_USERID)":"$(CURRENT_GROUP)" $(DOCKER_TTY) -v $(CURDIR):/app ci/rust
+DOCKER_TARGET_CMD		= $(word 2, $(subst /, ,$(@)))
+CI_CMD					?= $(RUST_DOCKER_CMD) make $(DOCKER_TARGET_CMD)
+CI_DEP_BUILD_CMD		?= $(DOCKER_BIN) build $(RUST_DOCKER_BUILD_ARG) -t $(CI_DOCKER_TAG) -f $(CURDIR)/build/ci/Dockerfile .
+CI_DOCKER_TAG			?= ci/rust
 
 .PHONY : fmt
 fmt :
@@ -62,4 +66,4 @@ ci/all : ci/dep
 
 .PHONY : ci/dep
 ci/dep :
-	@(docker build -t ci/rust -f $(CURDIR)/build/ci/Dockerfile .)
+	@($(CI_DEP_BUILD_CMD))
