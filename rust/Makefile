@@ -2,7 +2,8 @@ CARGO_BIN			?= cargo
 DOCKER_BIN			?= docker
 RUST_VERSION		?= 1.50.0
 
-RUST_DOCKER_CMD		?= $(DOCKER_BIN) run --rm -it -v ${CURDIR}:/app -w /app rust:${RUST_VERSION}
+DOCKER_TTY			?= -t
+RUST_DOCKER_CMD		?= $(DOCKER_BIN) run --rm $(DOCKER_TTY) -v $(CURDIR):/app -w /app rust:$(RUST_VERSION)
 DOCKER_TARGET_CMD	= $(word 2, $(subst /, ,$(@)))
 CI_CMD				?= $(RUST_DOCKER_CMD) make $(DOCKER_TARGET_CMD)
 
@@ -19,6 +20,7 @@ start :
 	@($(CARGO_BIN) run)
 
 .PHONY : quick-start
+quick-start : DOCKER_TTY += -i
 quick-start :
 	@printf '\n================================================================\n'
 	@printf 'Target: quick-start'
