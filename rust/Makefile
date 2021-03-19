@@ -1,9 +1,13 @@
-CARGO_BIN			?= cargo
-DOCKER_BIN			?= docker
+CURRENT_USERID 		?= $(shell id -u)
+CURRENT_GROUP		?= $(shell id -g)
+
+CARGO_BIN		?= cargo
+DOCKER_BIN		?= docker
 RUST_VERSION		?= 1.50.0
 
 DOCKER_TTY			?= -t
-RUST_DOCKER_CMD		?= $(DOCKER_BIN) run --rm $(DOCKER_TTY) -v $(CURDIR):/app -w /app ci/rust
+RUST_DOCKER_CMD_ARG	?= --arg
+RUST_DOCKER_CMD		?= $(DOCKER_BIN) run --rm --user "$(CURRENT_USERID)":"$(CURRENT_GROUP)" $(DOCKER_TTY) -v $(CURDIR):/app -w /app ci/rust
 DOCKER_TARGET_CMD	= $(word 2, $(subst /, ,$(@)))
 CI_CMD				?= $(RUST_DOCKER_CMD) make $(DOCKER_TARGET_CMD)
 
@@ -41,6 +45,7 @@ all : fmt lint test build
 
 .PHONY : ci/test
 ci/test : ci/dep
+	@printf 'CMD: $(RUST_DOCKER_CMD)\n'
 	@($(CI_CMD))
 
 .PHONY : ci/build
